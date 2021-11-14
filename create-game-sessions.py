@@ -25,16 +25,27 @@ def main():
         print(e)
         sys.exit(1)
 
-    
-            
-def createGameSessions(fleetId, number_of_sessions=1):
+def getActiveGameSessions(fleetId):
     client = boto3.client('gamelift')
-    for i in range(2):        
-        response = client.create_game_session(
-            FleetId=fleetId,
-            MaximumPlayerSessionCount=10
-        )
-    print(response)
+    activeSessionCount = 0
+    response = client.describe_game_sessions(
+        FleetId=fleetId
+    )
+    for gameSession in response['GameSessions']:
+        if gameSession['Status'] == 'ACTIVE':
+            activeSessionCount += 1
+    return activeSessionCount
+            
+def createGameSessions(fleetId, desiredNumberOfSessions=4):
+    client = boto3.client('gamelift')
+    currentNumberOfSessions = getActiveGameSessions(fleetId)
+    if currentNumberOfSessions < desiredNumberOfSessions:
+        for i in range(desiredNumberOfSessions - currentNumberOfSessions):
+            response = client.create_game_session(
+                FleetId=fleetId,
+                MaximumPlayerSessionCount=10
+            )
+            print(response)
     
 if __name__ == "__main__": 
     main()
