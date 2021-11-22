@@ -28,8 +28,9 @@ def describeGameSessions(fleet_id):
     response = client.describe_game_sessions(FleetId=fleet_id)
     i = 0
     for gameSession in response['GameSessions']:
-        gameSessionList.append("-sessionId" + alphabet[i] + "=" + gameSession['GameSessionId'])
-        i+=1
+        if gameSession['Status'] == 'ACTIVE':
+            gameSessionList.append("-sessionId" + alphabet[i] + "=" + gameSession['GameSessionId'])
+            i+=1
     print(" ".join(gameSessionList))
     
 if __name__ == "__main__":
