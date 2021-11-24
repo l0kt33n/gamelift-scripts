@@ -1,23 +1,22 @@
 from gameliftFunctions import describeGameSessions
 import sys, argparse
-import json
-import string
-alphabet=string.ascii_uppercase
+from dotenv import load_dotenv
+from os import environ
 
 def main():
     try:
         parser = argparse.ArgumentParser(description='Create Game Sessions')
         
-        parser.add_argument('-f', '--fleet-id', help='Fleet ID', required=True)
+        parser.add_argument('-a', '--alias_id', help='Fleet ID', required=False)
         
         arguments = parser.parse_args()
         
-        if arguments.fleet_id:
-            fleet_id = arguments.fleet_id
-            print(describeGameSessions(fleet_id))
+        if arguments.alias_id:
+            alias_id = arguments.alias_id
         else:
-            parser.print_help()
-            sys.exit(1)
+            load_dotenv()            
+            alias_id = environ.get('ALIAS_ID')
+        print(describeGameSessions(alias_id))
     except Exception as e:
         print(e)
         sys.exit(1)

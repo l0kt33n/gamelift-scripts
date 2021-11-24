@@ -1,26 +1,29 @@
 from gameliftFunctions import createGameSessions
-
 import sys, argparse
+import dotenv
 
 def main():
     try:
         parser = argparse.ArgumentParser(description='Create Game Sessions')
         
-        parser.add_argument('-f', '--fleet-id', help='Fleet ID', required=True)
-        parser.add_argument('-n', '--number-of-sessions', help='Number of sessions', required=True)
+        parser.add_argument('-a', '--alias-id', help='Alias ID', required=False)
+        parser.add_argument('-n', '--number-of-sessions', help='Number of sessions', required=False)
         
         arguments = parser.parse_args()
         
-        if arguments.fleet_id:
-            fleet_id = arguments.fleet_id
-            if arguments.number_of_sessions:
-                number_of_sessions = int(arguments.number_of_sessions)
-                print(createGameSessions(fleet_id, number_of_sessions))
-            else:
-                print(createGameSessions(fleet_id))
+        if arguments.alias_id:
+            alias_id = arguments.alias_id
         else:
-            parser.print_help()
-            sys.exit(1)
+            from dotenv import load_dotenv
+            load_dotenv()
+            from os import environ
+            alias_id = environ.get('ALIAS_ID')
+        if arguments.number_of_sessions:
+            number_of_sessions = int(arguments.number_of_sessions)
+        else:
+            number_of_sessions = 10
+        print(createGameSessions(alias_id, number_of_sessions))
+
     except Exception as e:
         print(e)
         sys.exit(1)

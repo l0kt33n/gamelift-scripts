@@ -1,31 +1,33 @@
 import boto3
+import string
+alphabet=string.ascii_uppercase
 
-def getActiveGameSessions(fleetId):
+def getActiveGameSessions(alias):
     client = boto3.client('gamelift')
     activeSessionCount = 0
     response = client.describe_game_sessions(
-        FleetId=fleetId
+        AliasId=alias
     )
     for gameSession in response['GameSessions']:
         if gameSession['Status'] == 'ACTIVE':
             activeSessionCount += 1
     return activeSessionCount
             
-def createGameSessions(fleetId, desiredNumberOfSessions=4):
+def createGameSessions(alias, desiredNumberOfSessions=10):
     client = boto3.client('gamelift')
-    currentNumberOfSessions = getActiveGameSessions(fleetId)
+    currentNumberOfSessions = getActiveGameSessions(alias)
     if currentNumberOfSessions < desiredNumberOfSessions:
         for i in range(desiredNumberOfSessions - currentNumberOfSessions):
             response = client.create_game_session(
-                FleetId=fleetId,
-                MaximumPlayerSessionCount=10
+                AliasId=alias,
+                MaximumPlayerSessionCount=desiredNumberOfSessions
             )
             return response
         
-def describeGameSessions(fleet_id):
+def describeGameSessions(alias):
     gameSessionList = []
     client = boto3.client('gamelift')
-    response = client.describe_game_sessions(FleetId=fleet_id)
+    response = client.describe_game_sessions(AliasId=alias)
     i = 0
     for gameSession in response['GameSessions']:
         if gameSession['Status'] == 'ACTIVE':
