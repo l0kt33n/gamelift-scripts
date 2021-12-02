@@ -13,16 +13,18 @@ def getActiveGameSessions(alias):
             activeSessionCount += 1
     return activeSessionCount
             
-def createGameSessions(alias, desiredNumberOfSessions=10):
+def createGameSessions(alias, desiredNumberOfSessions):
     client = boto3.client('gamelift')
     currentNumberOfSessions = getActiveGameSessions(alias)
+    responseList = []
     if currentNumberOfSessions < desiredNumberOfSessions:
         for i in range(desiredNumberOfSessions - currentNumberOfSessions):
             response = client.create_game_session(
                 AliasId=alias,
                 MaximumPlayerSessionCount=desiredNumberOfSessions
             )
-            return response
+            responseList.append(response)
+    return responseList
         
 def describeGameSessions(alias):
     gameSessionList = []
